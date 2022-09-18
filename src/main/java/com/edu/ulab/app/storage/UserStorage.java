@@ -1,8 +1,10 @@
 package com.edu.ulab.app.storage;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
-@Repository
+@Component
+@Primary
 public class UserStorage extends AbstractStorage {
 
 }

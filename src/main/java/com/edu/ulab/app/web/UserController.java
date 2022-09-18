@@ -42,22 +42,16 @@ public class UserController {
     }
 
     @PutMapping(value = "/update")
-    @Operation(summary = "Update user book row.",
-            responses = {
-                    @ApiResponse(description = "User book",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = UserBookResponse.class)))})
     public UserBookResponse updateUserWithBooks(@RequestBody UserBookRequest request) {
         UserBookResponse response = userDataFacade.updateUserWithBooks(request);
         log.info("Response with updated user and his books: {}", response);
         return response;
     }
 
-    //todo
     @GetMapping(value = "/get/{userId}")
     @Operation(summary = "Get user book row.",
             responses = {
-                    @ApiResponse(description = "User id",
+                    @ApiResponse(description = "User book",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UserBookResponse.class)))})
     public UserBookResponse getUserWithBooks(@PathVariable Long userId) {

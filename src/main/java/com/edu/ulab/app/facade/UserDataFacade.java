@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -64,9 +65,17 @@ public class UserDataFacade {
     }
 
     public UserBookResponse getUserWithBooks(Long userId) {
+        UserDto userDto = userService.getUserById(userId);
+        log.info("Find user: {}", userDto);
 
-        //todo
-        return null;
+        List<Long> bookIdList = bookService.getAllId().stream()
+                .filter(id -> bookService.getBookById(id).getUserId().equals(userId))
+                .collect(Collectors.toList());
+
+        return UserBookResponse.builder()
+                .userId(userDto.getId())
+                .booksIdList(bookIdList)
+                .build();
     }
 
     public void deleteUserWithBooks(Long userId) {

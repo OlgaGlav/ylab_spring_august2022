@@ -43,8 +43,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        //todo
-        return null;
+        User user = storage.findById(id);
+        return mapper.userEntityToUserDto(user);
     }
 
     @Override

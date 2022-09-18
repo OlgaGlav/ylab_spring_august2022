@@ -71,5 +71,6 @@ public class UserDataFacade {
 
     public void deleteUserWithBooks(Long userId) {
         //todo
+
     }
 }

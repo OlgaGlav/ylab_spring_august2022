@@ -45,13 +45,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getBookById(Long id) {
-        Book book = (Book) repository.findById(id);
+        Book book = repository.findById(id);
         return mapper.bookEntityToBookDto(book);
     }
 
     @Override
     public void deleteBookById(Long id) {
-        Book book = (Book) repository.findById(id);
+        Book book = repository.findById(id);
         if (book.getUserId() == null) {
             repository.delete(id);
         }
@@ -61,5 +61,4 @@ public class BookServiceImpl implements BookService {
     public Set<Long> getAllId() {
         return repository.getAllId();
     }
-
 }

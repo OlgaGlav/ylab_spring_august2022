@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     private static Long id = 0L;
 
-//    @Qualifier("user_repository")
-//    private final AbstractStorage repository;
-
     private final UserStorage repository;
     private final UserEntityMapper mapper;
 
@@ -38,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        User user = (User) repository.findById(id);
+        User user = repository.findById(id);
         return mapper.userEntityToUserDto(user);
     }
 

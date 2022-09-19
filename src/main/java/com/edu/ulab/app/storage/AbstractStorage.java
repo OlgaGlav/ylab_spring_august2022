@@ -12,7 +12,7 @@ public abstract class AbstractStorage<T extends AbstractProjectEntity> {
     private final Map<Long, T> repository = new HashMap<>();
 
     public T save(T entity) {
-        return (T) repository.put(entity.getId(), entity);
+        return repository.put(entity.getId(), entity);
     }
 
     public T findById(Long id) {

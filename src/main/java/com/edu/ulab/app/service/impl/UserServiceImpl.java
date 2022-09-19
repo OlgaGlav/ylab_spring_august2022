@@ -4,7 +4,7 @@ import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.dtomapper.UserEntityMapper;
 import com.edu.ulab.app.entity.User;
 import com.edu.ulab.app.service.UserService;
-import com.edu.ulab.app.storage.AbstractStorage;
+import com.edu.ulab.app.storage.UserStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,42 +13,37 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static Long id = 1L;
+    private static Long id = 0L;
 
-    private final AbstractStorage storage;
+//    @Qualifier("user_repository")
+//    private final AbstractStorage repository;
+
+    private final UserStorage repository;
     private final UserEntityMapper mapper;
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        //todo
-        // сгенерировать идентификатор
-        // создать пользователя
-        User user = new User();
-        user.setId(id++);
-        user.setAge(userDto.getAge());
-        user.setTitle(user.getTitle());
-        user.setFullName(userDto.getFullName());
-        // todo вернуть сохраненного пользователя со всеми необходимыми полями id
-        userDto.setId(id++);
-        storage.save(user);
-
-        return mapper.userEntityToUserDto(user);
+        User user = mapper.userDtoToUserEntity(userDto);
+        user.setId(++id);
+        repository.save(user);
+        userDto.setId(id);
+        return userDto;
     }
 
     @Override
     public UserDto updateUser(UserDto userDto) {
-        //todo
-        return null;
+        repository.save(mapper.userDtoToUserEntity(userDto));
+        return userDto;
     }
 
     @Override
     public UserDto getUserById(Long id) {
-        User user = storage.findById(id);
+        User user = (User) repository.findById(id);
         return mapper.userEntityToUserDto(user);
     }
 
     @Override
     public void deleteUserById(Long id) {
-        //todo
+        repository.delete(id);
     }
 }

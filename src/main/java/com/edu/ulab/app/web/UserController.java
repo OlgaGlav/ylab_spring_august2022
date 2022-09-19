@@ -41,9 +41,15 @@ public class UserController {
         return response;
     }
 
-    @PutMapping(value = "/update")
-    public UserBookResponse updateUserWithBooks(@RequestBody UserBookRequest request) {
-        UserBookResponse response = userDataFacade.updateUserWithBooks(request);
+    @PutMapping(value = "/update/{userId}")
+    @Operation(summary = "Get user book row.",
+            responses = {
+                    @ApiResponse(description = "User book",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UserBookResponse.class)))})
+    public UserBookResponse updateUserWithBooks(@PathVariable Long userId,
+                                                @RequestBody UserBookRequest request) {
+        UserBookResponse response = userDataFacade.updateUserWithBooks(userId, request);
         log.info("Response with updated user and his books: {}", response);
         return response;
     }
@@ -60,13 +66,8 @@ public class UserController {
         return response;
     }
 
-    //todo
     @DeleteMapping(value = "/delete/{userId}")
-    @Operation(summary = "Delete user book row.",
-            responses = {
-                    @ApiResponse(description = "User id",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = UserBookResponse.class)))})
+    @Operation(summary = "Delete user book row.")
     public void deleteUserWithBooks(@PathVariable Long userId) {
         log.info("Delete user and his books:  userId {}", userId);
         userDataFacade.deleteUserWithBooks(userId);

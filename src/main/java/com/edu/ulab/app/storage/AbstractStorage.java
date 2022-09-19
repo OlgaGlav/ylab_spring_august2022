@@ -8,19 +8,22 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
-public abstract class AbstractStorage {
+public abstract class AbstractStorage<T extends AbstractProjectEntity> {
+    private final Map<Long, T> repository = new HashMap<>();
 
-    private final Map<Long, AbstractProjectEntity> repository = new HashMap<>();
-
-    public AbstractProjectEntity save(AbstractProjectEntity entity) {
-        return repository.put(entity.getId(), entity);
+    public T save(T entity) {
+        return (T) repository.put(entity.getId(), entity);
     }
 
-    public <T extends AbstractProjectEntity> T findById(Long id) {
-        return (T) repository.get(id);
+    public T findById(Long id) {
+        return repository.get(id);
     }
 
     public Set<Long> getAllId() {
         return repository.keySet();
+    }
+
+    public void delete(Long id) {
+        repository.remove(id);
     }
 }

@@ -21,6 +21,14 @@ public class ControllerExceptionHandler {
                 .body(new BaseWebResponse(createErrorMessage(exc)));
     }
 
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<BaseWebResponse> handleUnsupportedOperationException(@NonNull final UnsupportedOperationException exc) {
+        log.error(exc.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new BaseWebResponse(createErrorMessage(exc)));
+    }
+
+
     private String createErrorMessage(Exception exception) {
         final String message = exception.getMessage();
         log.error(ExceptionHandlerUtils.buildErrorMessage(exception));

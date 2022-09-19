@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -34,12 +35,16 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto updateBook(BookDto bookDto) {
         List<Book> books = repository.findByUser(bookDto.getUserId());
-        for (Book b : books) {
-            if (b.getTitle().equals(bookDto.getTitle())) {
-                bookDto.setId(b.getId());
-            }
-        }
-        repository.save(mapper.bookDtoToBookEntity(bookDto));
+
+        Optional<Book> needed = books.stream()
+                .filter(book -> book.getTitle().equals(bookDto.getTitle())).findAny();
+
+        needed.ifPresentOrElse(
+                book -> {
+                    bookDto.setId(book.getId());
+                    repository.save(mapper.bookDtoToBookEntity(bookDto));
+                },
+                () -> createBook(bookDto));
         return bookDto;
     }
 

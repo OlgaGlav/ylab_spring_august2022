@@ -43,7 +43,6 @@ public class UserDataFacade {
                 .peek(createdBook -> log.info("Created book: {}", createdBook))
                 .map(BookDto::getId)
                 .toList();
-        bookIdList.forEach(System.out::println);
         log.info("Collected book ids: {}", bookIdList);
 
         return UserBookResponse.builder()
@@ -66,9 +65,7 @@ public class UserDataFacade {
                 .filter(Objects::nonNull)
                 .map(bookMapper::bookRequestToBookDto)
                 .peek(bookDto -> bookDto.setUserId(updatedUser.getId()))
-                .peek(mappedBookDto -> log.info("mapped book: {}", mappedBookDto))
                 .map(bookService::updateBook)
-                .peek(updatedBook -> log.info("Updated book: {}", updatedBook))
                 .map(BookDto::getId)
                 .toList();
         log.info("Collected book ids: {}", bookIdList);

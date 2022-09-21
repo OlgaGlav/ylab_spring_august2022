@@ -3,6 +3,8 @@ package com.edu.ulab.app.service;
 
 import com.edu.ulab.app.dto.BookDto;
 
+import java.util.Set;
+
 public interface BookService {
     BookDto createBook(BookDto userDto);
 
@@ -11,4 +13,6 @@ public interface BookService {
     BookDto getBookById(Long id);
 
     void deleteBookById(Long id);
+
+    Set<Long> getAllId();
 }

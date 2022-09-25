@@ -32,7 +32,7 @@ public class BookServiceImplTemplate implements BookService {
 
     @Override
     public BookDto createBook(BookDto bookDto) {
-        final String INSERT_SQL = "INSERT INTO BOOK (TITLE, AUTHOR, PAGE_COUNT, USER_ID) VALUES (?,?,?,?)";
+        final String INSERT_SQL = "INSERT INTO BOOK (TITLE, AUTHOR, PAGE_COUNT, PERSON_ID) VALUES (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -54,7 +54,7 @@ public class BookServiceImplTemplate implements BookService {
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        final String sql = "SELECT * FROM BOOK WHERE USER_ID = ?";
+        final String sql = "SELECT * FROM BOOK WHERE PERSON_ID = ?";
         List<Book> books = jdbcTemplate.query(sql,
                 new Object[]{bookDto.getUserId()},
                 new BookMapperTemplate());
@@ -62,7 +62,7 @@ public class BookServiceImplTemplate implements BookService {
         Long neededId = books.stream()
                 .filter(book -> book.getTitle().equals(bookDto.getTitle())).findAny().get().getId();
         bookDto.setId(neededId);
-        final String UPDATE_SQL = "UPDATE BOOK SET title = ?, author = ?, page_count = ?, user_id = ? WHERE id = ?";
+        final String UPDATE_SQL = "UPDATE BOOK SET TITLE = ?, AUTHOR = ?, PAGE_COUNT = ?, PERSON_ID = ? WHERE id = ?";
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
                     public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
@@ -100,5 +100,15 @@ public class BookServiceImplTemplate implements BookService {
         String sql = "SELECT * FROM BOOK";
         List<Book> books = jdbcTemplate.query(sql, new BookMapperTemplate());
         return books.stream().map(Book::getId).collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<BookDto> findAllByUserId(Long userId) {
+        return null;
+    }
+
+    @Override
+    public void deleteBookByUserId(Long userId) {
+        //todo
     }
 }

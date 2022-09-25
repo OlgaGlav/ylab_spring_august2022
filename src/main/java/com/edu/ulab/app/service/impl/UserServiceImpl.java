@@ -51,13 +51,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-        Optional<Person> person = repository.findById(id);
-        if (person.isPresent()) {
-            log.info("Deleted user with id: {}", id);
-            repository.delete(person.get());
-        } else {
-            log.info("User with id {} dont exist", id);
-            throw new NotFoundException("User with id" + id + " dont exist");
-        }
+        repository.deleteById(id);
+//        Optional<Person> person = repository.findById(id);
+//        log.info("Person for delete is: {}", person.get());
+//        if (person.isPresent()) {
+//            log.info("Deleted user with id: {}", id);
+//            repository.deleteById(id);
+//        } else {
+//            log.info("User with id {} dont exist", id);
+//            throw new NotFoundException("User with id" + id + " dont exist");
+//        }
     }
 }

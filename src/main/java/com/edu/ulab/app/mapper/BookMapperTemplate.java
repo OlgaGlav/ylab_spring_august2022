@@ -16,7 +16,8 @@ public class BookMapperTemplate implements RowMapper<Book>, Serializable {
         book.setTitle(rs.getString("TITLE"));
         book.setAuthor(rs.getString("AUTHOR"));
         book.setPageCount(rs.getLong("PAGE_COUNT"));
-        book.setUserId(rs.getLong("USER_ID"));
+        //todo
+//        book.setPerson(rs.getLong("PERSON_ID"));
         return book;
     }
 }

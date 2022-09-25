@@ -3,6 +3,7 @@ package com.edu.ulab.app.service;
 
 import com.edu.ulab.app.dto.BookDto;
 
+import java.util.List;
 import java.util.Set;
 
 public interface BookService {
@@ -15,4 +16,9 @@ public interface BookService {
     void deleteBookById(Long id);
 
     Set<Long> getAllId();
+
+    List<BookDto> findAllByUserId(Long userId);
+
+    void deleteBookByUserId(Long userId);
+
 }

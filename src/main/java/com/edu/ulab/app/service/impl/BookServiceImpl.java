@@ -2,29 +2,29 @@ package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
+import com.edu.ulab.app.exception.NotFoundException;
 import com.edu.ulab.app.mapper.BookMapper;
 import com.edu.ulab.app.repository.BookRepository;
 import com.edu.ulab.app.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Primary
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
-    private static Long id = 0L;
 
     private final BookMapper mapper;
-
     private final BookRepository repository;
-//    private final BookStorage repository;
 
-    //todo
     @Override
     public BookDto createBook(BookDto bookDto) {
         Book book = mapper.bookDtoToBook(bookDto);
@@ -32,17 +32,11 @@ public class BookServiceImpl implements BookService {
         Book savedBook = repository.save(book);
         log.info("Saved book: {}", savedBook);
         return mapper.bookToBookDto(savedBook);
-//        Book book = mapper.bookDtoToBookEntity(bookDto);
-//        book.setId(++id);
-//        repository.save(book);
-//        bookDto.setId(id);
-//        return bookDto;
     }
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        //todo
-        List<Book> books = repository.findByUser(bookDto.getUserId());
+        List<Book> books = repository.findAllByUserId(bookDto.getUserId());
 
         Optional<Book> needed = books.stream()
                 .filter(book -> book.getTitle().equals(bookDto.getTitle())).findAny();
@@ -50,7 +44,7 @@ public class BookServiceImpl implements BookService {
         needed.ifPresentOrElse(
                 book -> {
                     bookDto.setId(book.getId());
-                    repository.save(mapper.bookDtoToBookEntity(bookDto));
+                    repository.save(mapper.bookDtoToBook(bookDto));
                 },
                 () -> createBook(bookDto));
         return bookDto;
@@ -58,22 +52,30 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getBookById(Long id) {
-        //todo
-        Book book = repository.findById(id);
-        return mapper.bookEntityToBookDto(book);
+        Optional<Book> book = repository.findById(id);
+        if (book.isPresent()) {
+            log.info("Finded book with id: {}", id);
+            return mapper.bookToBookDto(book.get());
+        }
+        log.info("Book with id {} dont exist", id);
+        throw new NotFoundException("Book with id" + id + " dont exist");
     }
 
     @Override
     public void deleteBookById(Long id) {
-        //todo
-        Book book = repository.findById(id);
-        if (book.getUserId() == null) {
-            repository.delete(id);
+        Optional<Book> book = repository.findById(id);
+        if (book.isPresent()) {
+            log.info("Deleted book with id: {}", id);
+            repository.delete(book.get());
         }
+        log.info("Book with id {} dont exist", id);
+        throw new NotFoundException("Book with id" + id + " dont exist");
+
     }
 
     @Override
     public Set<Long> getAllId() {
-        return repository.getAllId();
+        List<Book> books = (List<Book>) repository.findAll();
+        return books.stream().map(Book::getId).collect(Collectors.toSet());
     }
 }

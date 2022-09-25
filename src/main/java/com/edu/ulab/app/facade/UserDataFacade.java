@@ -4,8 +4,8 @@ import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.mapper.BookMapper;
 import com.edu.ulab.app.mapper.UserMapper;
-import com.edu.ulab.app.service.BookService;
-import com.edu.ulab.app.service.UserService;
+import com.edu.ulab.app.service.impl.BookServiceImplTemplate;
+import com.edu.ulab.app.service.impl.UserServiceImplTemplate;
 import com.edu.ulab.app.web.request.UserBookRequest;
 import com.edu.ulab.app.web.response.UserBookResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,13 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class UserDataFacade {
-    private final UserService userService;
-    private final BookService bookService;
+
+    //todo
+//    @Qualifier("user_template")
+    private final UserServiceImplTemplate userService;
+    //todo
+//    @Qualifier("book_template")
+    private final BookServiceImplTemplate bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
 

@@ -1,10 +1,10 @@
 package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.BookDto;
-import com.edu.ulab.app.dtomapper.BookEntityMapper;
 import com.edu.ulab.app.entity.Book;
+import com.edu.ulab.app.mapper.BookMapper;
+import com.edu.ulab.app.repository.BookRepository;
 import com.edu.ulab.app.service.BookService;
-import com.edu.ulab.app.storage.BookStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,21 +19,29 @@ import java.util.Set;
 public class BookServiceImpl implements BookService {
     private static Long id = 0L;
 
-    private final BookEntityMapper mapper;
+    private final BookMapper mapper;
 
-    private final BookStorage repository;
+    private final BookRepository repository;
+//    private final BookStorage repository;
 
+    //todo
     @Override
     public BookDto createBook(BookDto bookDto) {
-        Book book = mapper.bookDtoToBookEntity(bookDto);
-        book.setId(++id);
-        repository.save(book);
-        bookDto.setId(id);
-        return bookDto;
+        Book book = mapper.bookDtoToBook(bookDto);
+        log.info("Mapped book: {}", book);
+        Book savedBook = repository.save(book);
+        log.info("Saved book: {}", savedBook);
+        return mapper.bookToBookDto(savedBook);
+//        Book book = mapper.bookDtoToBookEntity(bookDto);
+//        book.setId(++id);
+//        repository.save(book);
+//        bookDto.setId(id);
+//        return bookDto;
     }
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
+        //todo
         List<Book> books = repository.findByUser(bookDto.getUserId());
 
         Optional<Book> needed = books.stream()
@@ -50,12 +58,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getBookById(Long id) {
+        //todo
         Book book = repository.findById(id);
         return mapper.bookEntityToBookDto(book);
     }
 
     @Override
     public void deleteBookById(Long id) {
+        //todo
         Book book = repository.findById(id);
         if (book.getUserId() == null) {
             repository.delete(id);

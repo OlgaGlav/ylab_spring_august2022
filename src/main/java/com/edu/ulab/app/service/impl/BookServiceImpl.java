@@ -45,18 +45,20 @@ public class BookServiceImpl implements BookService {
                 .findAny();
 
         needed.ifPresentOrElse(
-                book -> {
-                    bookDto.setId(book.getId());
-                    book = mapper.bookDtoToBook(bookDto);
-                    book.setPerson(needed.get().getPerson());
-                    bookRepository.save(book);
-                    log.info("Updated book: {}", book);
-                },
+                book -> update(bookDto, needed, book),
                 () -> {
                     createBook(bookDto);
                     log.info("Created new book");
                 });
         return bookDto;
+    }
+
+    private void update(BookDto bookDto, Optional<Book> needed, Book book) {
+        bookDto.setId(book.getId());
+        book = mapper.bookDtoToBook(bookDto);
+        book.setPerson(needed.get().getPerson());
+        bookRepository.save(book);
+        log.info("Updated book: {}", book);
     }
 
     @Override

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,25 +39,24 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        Optional<Book> needed = bookRepository.findAllByPersonId(bookDto.getUserId()).stream()
+        bookRepository.findAllByPersonId(bookDto.getUserId()).stream()
                 .filter(book -> book.getTitle().equals(bookDto.getTitle()))
-                .findAny();
-
-        needed.ifPresentOrElse(
-                book -> update(bookDto, needed, book),
-                () -> {
-                    createBook(bookDto);
-                    log.info("Created new book");
-                });
+                .findAny()
+                .ifPresentOrElse(
+                        book -> update(bookDto, book),
+                        () -> {
+                            createBook(bookDto);
+                            log.info("Created new book");
+                        });
         return bookDto;
     }
 
-    private void update(BookDto bookDto, Optional<Book> needed, Book book) {
+    private void update(BookDto bookDto, Book book) {
         bookDto.setId(book.getId());
-        book = mapper.bookDtoToBook(bookDto);
-        book.setPerson(needed.get().getPerson());
-        bookRepository.save(book);
-        log.info("Updated book: {}", book);
+        Book bookTemp = mapper.bookDtoToBook(bookDto);
+        bookTemp.setPerson(book.getPerson());
+        bookRepository.save(bookTemp);
+        log.info("Updated book: {}", bookTemp);
     }
 
     @Override

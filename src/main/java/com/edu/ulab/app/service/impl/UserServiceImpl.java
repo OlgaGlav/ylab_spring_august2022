@@ -1,37 +1,50 @@
 package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.UserDto;
+import com.edu.ulab.app.entity.Person;
+import com.edu.ulab.app.exception.NotFoundException;
+import com.edu.ulab.app.mapper.UserMapper;
+import com.edu.ulab.app.repository.UserRepository;
 import com.edu.ulab.app.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Primary
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final UserRepository repository;
+    private final UserMapper mapper;
+
     @Override
     public UserDto createUser(UserDto userDto) {
-        //todo
-        // сгенерировать идентификатор
-        // создать пользователя
-        // вернуть сохраненного пользователя со всеми необходимыми полями id
-        userDto.setId(1L);
-        return userDto;
+        Person person = mapper.userDtoToPerson(userDto);
+        log.info("Mapped user: {}", person);
+        Person savedUser = repository.save(person);
+        log.info("Saved user: {}", savedUser);
+        return mapper.personToUserDto(savedUser);
     }
 
     @Override
     public UserDto updateUser(UserDto userDto) {
-        //todo
-        return null;
+        repository.save(mapper.userDtoToPerson(userDto));
+        log.info("User update");
+        return userDto;
     }
 
     @Override
     public UserDto getUserById(Long id) {
-        //todo
-        return null;
+        log.info("Finded user with id: {}", id);
+        return mapper.personToUserDto(repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id" + id + " doesn't exist")));
     }
 
     @Override
     public void deleteUserById(Long id) {
-        //todo
+        repository.deleteById(id);
+        log.info("User with id {} deleted", id);
     }
 }

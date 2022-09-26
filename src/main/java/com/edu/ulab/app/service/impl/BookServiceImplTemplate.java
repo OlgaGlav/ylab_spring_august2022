@@ -12,7 +12,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -32,17 +34,7 @@ public class BookServiceImplTemplate implements BookService {
         final String INSERT_SQL = "INSERT INTO BOOK (TITLE, AUTHOR, PAGE_COUNT, PERSON_ID) VALUES (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
-                connection -> {
-                    PreparedStatement ps =
-                            connection.prepareStatement(INSERT_SQL, new String[]{"id"});
-                    ps.setString(1, bookDto.getTitle());
-                    ps.setString(2, bookDto.getAuthor());
-                    ps.setLong(3, bookDto.getPageCount());
-                    ps.setLong(4, bookDto.getUserId());
-                    return ps;
-                },
-                keyHolder);
-
+                connection -> getPreparedStatement(bookDto, INSERT_SQL, connection), keyHolder);
         bookDto.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return bookDto;
     }
@@ -63,12 +55,7 @@ public class BookServiceImplTemplate implements BookService {
                             final String UPDATE_SQL = "UPDATE BOOK SET TITLE = ?, AUTHOR = ?, PAGE_COUNT = ?, PERSON_ID = ? WHERE id = ?";
                             jdbcTemplate.update(
                                     connection -> {
-                                        PreparedStatement ps =
-                                                connection.prepareStatement(UPDATE_SQL);
-                                        ps.setString(1, bookDto.getTitle());
-                                        ps.setString(2, bookDto.getAuthor());
-                                        ps.setLong(3, bookDto.getPageCount());
-                                        ps.setLong(4, bookDto.getUserId());
+                                        PreparedStatement ps = getPreparedStatement(bookDto, UPDATE_SQL, connection);
                                         ps.setLong(5, bookDto.getId());
                                         return ps;
                                     });
@@ -115,5 +102,15 @@ public class BookServiceImplTemplate implements BookService {
         String sql = "DELETE FROM BOOK b WHERE PERSON_ID =" + userId;
         jdbcTemplate.execute(sql);
         log.info("Books with userId {} deleted", userId);
+    }
+
+    private PreparedStatement getPreparedStatement(BookDto bookDto, String sql, Connection connection) throws SQLException {
+        PreparedStatement ps =
+                connection.prepareStatement(sql, new String[]{"id"});
+        ps.setString(1, bookDto.getTitle());
+        ps.setString(2, bookDto.getAuthor());
+        ps.setLong(3, bookDto.getPageCount());
+        ps.setLong(4, bookDto.getUserId());
+        return ps;
     }
 }

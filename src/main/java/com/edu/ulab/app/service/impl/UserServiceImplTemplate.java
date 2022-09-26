@@ -14,7 +14,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Objects;
 
 @Slf4j
@@ -30,14 +32,7 @@ public class UserServiceImplTemplate implements UserService {
         final String INSERT_SQL = "INSERT INTO PERSON(FULL_NAME, TITLE, AGE) VALUES (?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
-                connection -> {
-                    PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[]{"id"});
-                    ps.setString(1, userDto.getFullName());
-                    ps.setString(2, userDto.getTitle());
-                    ps.setLong(3, userDto.getAge());
-                    return ps;
-                }, keyHolder);
-
+                connection -> getPreparedStatement(userDto, INSERT_SQL, connection), keyHolder);
         userDto.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return userDto;
     }
@@ -47,11 +42,7 @@ public class UserServiceImplTemplate implements UserService {
         final String UPDATE_SQL = "UPDATE PERSON SET FULL_NAME = ?, TITLE = ?, AGE = ? WHERE ID = ?";
         jdbcTemplate.update(
                 connection -> {
-                    PreparedStatement ps =
-                            connection.prepareStatement(UPDATE_SQL);
-                    ps.setString(1, userDto.getFullName());
-                    ps.setString(2, userDto.getTitle());
-                    ps.setInt(3, userDto.getAge());
+                    PreparedStatement ps = getPreparedStatement(userDto, UPDATE_SQL, connection);
                     ps.setLong(4, userDto.getId());
                     return ps;
                 });
@@ -76,5 +67,13 @@ public class UserServiceImplTemplate implements UserService {
         String sql = "DELETE FROM PERSON WHERE ID = " + id;
         jdbcTemplate.execute(sql);
         log.info("User with id {} deleted", id);
+    }
+
+    private PreparedStatement getPreparedStatement(UserDto userDto, String sql, Connection connection) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+        ps.setString(1, userDto.getFullName());
+        ps.setString(2, userDto.getTitle());
+        ps.setLong(3, userDto.getAge());
+        return ps;
     }
 }

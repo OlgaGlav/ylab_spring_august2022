@@ -21,11 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserDataFacade {
 
-    //todo
-//    @Qualifier("user_template")
     private final UserServiceImplTemplate userService;
-    //todo
-//    @Qualifier("book_template")
     private final BookServiceImplTemplate bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;

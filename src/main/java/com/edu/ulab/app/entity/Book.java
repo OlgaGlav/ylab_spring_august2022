@@ -5,7 +5,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -24,7 +23,6 @@ public class Book {
     private String title;
     @Size(min = 2, max = 255)
     private String author;
-    @Digits(integer = 5, fraction = 0)
     private long pageCount;
 
     @Override

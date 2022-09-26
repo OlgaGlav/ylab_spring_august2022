@@ -3,6 +3,8 @@ package com.edu.ulab.app.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -13,11 +15,15 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(min = 2, max = 255)
     private String fullName;
+
+    @Size(min = 2, max = 255)
     private String title;
+
+    @Digits(integer = 3, fraction = 0)
     private int age;
+
     @OneToMany(mappedBy = "person")
     private List<Book> books;
-
-
 }

@@ -5,6 +5,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "book")
@@ -18,9 +20,12 @@ public class Book {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Person person;
+    @Size(min = 2, max = 255)
     private String title;
+    @Size(min = 2, max = 255)
     private String author;
-    private Long pageCount;
+    @Digits(integer = 5, fraction = 0)
+    private long pageCount;
 
     @Override
     public String toString() {

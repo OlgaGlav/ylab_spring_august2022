@@ -40,13 +40,15 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        List<Book> books = bookRepository.findAllByPersonId(bookDto.getUserId());
-        Optional<Book> needed = books.stream()
-                .filter(book -> book.getTitle().equals(bookDto.getTitle())).findAny();
+        Optional<Book> needed = bookRepository.findAllByPersonId(bookDto.getUserId()).stream()
+                .filter(book -> book.getTitle().equals(bookDto.getTitle()))
+                .findAny();
 
         needed.ifPresentOrElse(
                 book -> {
                     bookDto.setId(book.getId());
+                    book = mapper.bookDtoToBook(bookDto);
+                    book.setPerson(needed.get().getPerson());
                     bookRepository.save(book);
                     log.info("Updated book: {}", book);
                 },
@@ -59,32 +61,21 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getBookById(Long id) {
-        Optional<Book> book = bookRepository.findById(id);
-        if (book.isPresent()) {
-            log.info("Finded book with id: {}", id);
-
-            return mapper.bookToBookDto(book.get());
-        }
-        log.info("Book with id {} dont exist", id);
-        throw new NotFoundException("Book with id" + id + " dont exist");
+        log.info("Finded book with id: {}", id);
+        return mapper.bookToBookDto(bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Book with id" + id + " dont exist")));
     }
 
     @Override
     public void deleteBookById(Long id) {
-        Optional<Book> book = bookRepository.findById(id);
-        if (book.isPresent()) {
-            log.info("Deleted book with id: {}", id);
-            bookRepository.delete(book.get());
-        }
-        log.info("Book with id {} dont exist", id);
-        throw new NotFoundException("Book with id" + id + " dont exist");
-
+        bookRepository.deleteById(id);
+        log.info("Book with id {} deleted", id);
     }
 
     @Override
     public Set<Long> getAllId() {
-        List<Book> books = (List<Book>) bookRepository.findAll();
-        return books.stream().map(Book::getId).collect(Collectors.toSet());
+        return ((List<Book>) bookRepository.findAll()).stream()
+                .map(Book::getId).collect(Collectors.toSet());
     }
 
     public List<BookDto> findAllByUserId(Long userId) {
@@ -94,7 +85,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void deleteBookByUserId(Long userId) {
+    public void deleteAllBooksByUserId(Long userId) {
         bookRepository.deleteAllByPersonId(userId);
+        log.info("Books with userId {} deleted", userId);
     }
 }

@@ -9,15 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Objects;
 
 @Slf4j
@@ -49,28 +46,28 @@ public class UserServiceImplTemplate implements UserService {
     public UserDto updateUser(UserDto userDto) {
         final String UPDATE_SQL = "UPDATE PERSON SET FULL_NAME = ?, TITLE = ?, AGE = ? WHERE ID = ?";
         jdbcTemplate.update(
-                new PreparedStatementCreator() {
-                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                        PreparedStatement ps =
-                                connection.prepareStatement(UPDATE_SQL);
-                        ps.setString(1, userDto.getFullName());
-                        ps.setString(2, userDto.getTitle());
-                        ps.setInt(3, userDto.getAge());
-                        ps.setLong(4, userDto.getId());
-                        return ps;
-                    }
+                connection -> {
+                    PreparedStatement ps =
+                            connection.prepareStatement(UPDATE_SQL);
+                    ps.setString(1, userDto.getFullName());
+                    ps.setString(2, userDto.getTitle());
+                    ps.setInt(3, userDto.getAge());
+                    ps.setLong(4, userDto.getId());
+                    return ps;
                 });
+        log.info("User update");
         return userDto;
     }
 
     @Override
     public UserDto getUserById(Long id) {
+        log.info("Finded user with id: {}", id);
         String sql = "SELECT * FROM PERSON WHERE ID = " + id;
         try {
             Person person = jdbcTemplate.queryForObject(sql, new UserMapperTemplate());
             return mapper.personToUserDto(person);
-            //todo
         } catch (EmptyResultDataAccessException e) {
+            log.warn("User with id " + id + " dont exist.");
             throw new NotFoundException("User with id " + id + " dont exist.");
         }
     }
@@ -79,6 +76,6 @@ public class UserServiceImplTemplate implements UserService {
     public void deleteUserById(Long id) {
         String sql = "DELETE FROM PERSON WHERE ID = " + id;
         jdbcTemplate.execute(sql);
-
+        log.info("User with id {} deleted", id);
     }
 }

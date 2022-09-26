@@ -1,6 +1,7 @@
 package com.edu.ulab.app.mapper;
 
 import com.edu.ulab.app.entity.Book;
+import com.edu.ulab.app.entity.Person;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.io.Serializable;
@@ -16,8 +17,8 @@ public class BookMapperTemplate implements RowMapper<Book>, Serializable {
         book.setTitle(rs.getString("TITLE"));
         book.setAuthor(rs.getString("AUTHOR"));
         book.setPageCount(rs.getLong("PAGE_COUNT"));
-        //todo
-//        book.setPerson(rs.getLong("PERSON_ID"));
+        book.setPerson(new Person());
+        book.getPerson().setId(rs.getLong("PERSON_ID"));
         return book;
     }
 }

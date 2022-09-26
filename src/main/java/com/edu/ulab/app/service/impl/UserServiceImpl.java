@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -40,26 +39,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        Optional<Person> person = repository.findById(id);
-        if (person.isPresent()) {
-            log.info("Finded user with id: {}", id);
-            return mapper.personToUserDto(person.get());
-        }
-        log.info("User with id {} dont exist", id);
-        throw new NotFoundException("User with id" + id + " dont exist");
+        log.info("Finded user with id: {}", id);
+        return mapper.personToUserDto(repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id" + id + " dont exist")));
     }
 
     @Override
     public void deleteUserById(Long id) {
         repository.deleteById(id);
-//        Optional<Person> person = repository.findById(id);
-//        log.info("Person for delete is: {}", person.get());
-//        if (person.isPresent()) {
-//            log.info("Deleted user with id: {}", id);
-//            repository.deleteById(id);
-//        } else {
-//            log.info("User with id {} dont exist", id);
-//            throw new NotFoundException("User with id" + id + " dont exist");
-//        }
+        log.info("User with id {} deleted", id);
     }
 }

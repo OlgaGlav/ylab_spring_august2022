@@ -63,7 +63,7 @@ public class BookServiceImpl implements BookService {
     public BookDto getBookById(Long id) {
         log.info("Finded book with id: {}", id);
         return mapper.bookToBookDto(bookRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Book with id" + id + " dont exist")));
+                .orElseThrow(() -> new NotFoundException("Book with id" + id + " doesn't exist")));
     }
 
     @Override

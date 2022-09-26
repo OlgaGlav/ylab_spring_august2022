@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long id) {
         log.info("Finded user with id: {}", id);
         return mapper.personToUserDto(repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id" + id + " dont exist")));
+                .orElseThrow(() -> new NotFoundException("User with id" + id + " doesn't exist")));
     }
 
     @Override

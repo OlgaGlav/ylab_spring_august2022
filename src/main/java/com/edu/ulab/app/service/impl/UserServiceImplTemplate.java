@@ -67,8 +67,7 @@ public class UserServiceImplTemplate implements UserService {
             Person person = jdbcTemplate.queryForObject(sql, new UserMapperTemplate());
             return mapper.personToUserDto(person);
         } catch (EmptyResultDataAccessException e) {
-            log.warn("User with id " + id + " dont exist.");
-            throw new NotFoundException("User with id " + id + " dont exist.");
+            throw new NotFoundException("User with id " + id + " doesn't exist.");
         }
     }
 

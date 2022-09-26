@@ -2,10 +2,8 @@ package com.edu.ulab.app.dto;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-public class BookDto implements Serializable {
+public class BookDto {
     private Long id;
     private Long userId;
     private String title;

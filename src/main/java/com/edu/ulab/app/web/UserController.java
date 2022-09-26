@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/update/{userId}")
-    @Operation(summary = "Get user book row.",
+    @Operation(summary = "Update user with book",
             responses = {
                     @ApiResponse(description = "User book",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/get/{userId}")
-    @Operation(summary = "Get user book row.",
+    @Operation(summary = "Get user with book.",
             responses = {
                     @ApiResponse(description = "User book",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/delete/{userId}")
-    @Operation(summary = "Delete user book row.")
+    @Operation(summary = "Delete user with books.")
     public void deleteUserWithBooks(@PathVariable Long userId) {
         log.info("Delete user and his books:  userId {}", userId);
         userDataFacade.deleteUserWithBooks(userId);

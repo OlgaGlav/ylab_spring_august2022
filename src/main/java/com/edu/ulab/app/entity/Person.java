@@ -20,6 +20,9 @@ public class Person {
     @Size(min = 2, max = 255)
     private String title;
 
+    //todo
+    //    @Column(nullable = false)
+    //    private int count;
     private int age;
 
     @OneToMany(mappedBy = "person")

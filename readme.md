@@ -24,4 +24,7 @@ http://localhost:8091/app/api/v1/user/create
 ]
 }
 
+docker run --name postgres -d -p 5432:5432 -e POSTGRES_DB=ulab_edu -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test
+postgres:alpine
+
 rqid requestId1010101

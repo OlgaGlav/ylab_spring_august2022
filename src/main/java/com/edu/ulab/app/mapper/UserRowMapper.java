@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserMapperTemplate implements RowMapper<Person>, Serializable {
+public class UserRowMapper implements RowMapper<Person>, Serializable {
 
     @Override
     public Person mapRow(ResultSet rs, int rowNum) throws SQLException {

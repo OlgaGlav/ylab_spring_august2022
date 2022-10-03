@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto create(UserDto userDto) {
         Person person = mapper.userDtoToPerson(userDto);
         log.info("Mapped user: {}", person);
         Person savedUser = repository.save(person);
@@ -29,21 +29,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto) {
+    public UserDto update(UserDto userDto) {
         repository.save(mapper.userDtoToPerson(userDto));
         log.info("User update");
         return userDto;
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserDto findById(Long id) {
         log.info("Finded user with id: {}", id);
         return mapper.personToUserDto(repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id" + id + " doesn't exist")));
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteById(Long id) {
         repository.deleteById(id);
         log.info("User with id {} deleted", id);
     }

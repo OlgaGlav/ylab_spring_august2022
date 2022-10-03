@@ -30,38 +30,39 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testing user functionality.")
 public class UserServiceImplTest {
     @InjectMocks
-    UserServiceImpl userService;
+    private UserServiceImpl userService;
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Mock
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
-    Person person = new Person();
-    Person savedPerson = new Person();
-    UserDto userDto = new UserDto();
-    UserDto result = new UserDto();
-    long ID = 1L;
-    long NOT_EXIST_ID = 2L;
+    private final Person person = new Person();
+    private final Person savedPerson = new Person();
+    private final UserDto userDto = new UserDto();
+    private final UserDto result = new UserDto();
+    private final long ID = 1L;
+    private final long NOT_EXIST_ID = 2L;
 
     @BeforeEach
     void setUp() {
-        userDto.setAge(11);
+        int AGE = 11;
+        userDto.setAge(AGE);
         userDto.setFullName("test name");
         userDto.setTitle("test title");
 
         person.setFullName("test name");
-        person.setAge(11);
+        person.setAge(AGE);
         person.setTitle("test title");
 
         savedPerson.setId(ID);
         savedPerson.setFullName("test name");
-        savedPerson.setAge(11);
+        savedPerson.setAge(AGE);
         savedPerson.setTitle("test title");
 
         result.setId(ID);
-        result.setAge(11);
+        result.setAge(AGE);
         result.setFullName("test name");
         result.setTitle("test title");
     }
@@ -77,7 +78,7 @@ public class UserServiceImplTest {
 
 
         //then
-        UserDto userDtoResult = userService.createUser(userDto);
+        UserDto userDtoResult = userService.create(userDto);
         assertEquals(ID, userDtoResult.getId());
     }
 
@@ -89,7 +90,7 @@ public class UserServiceImplTest {
         when(userRepository.save(person)).thenReturn(savedPerson);
         when(userMapper.personToUserDto(savedPerson)).thenReturn(userDto);
 
-        assertEquals(userDto, userService.updateUser(userDto));
+        assertEquals(userDto, userService.update(userDto));
         verify(userRepository, times(1)).save(any());
         verify(userMapper, times(1)).userDtoToPerson(any());
     }
@@ -100,8 +101,8 @@ public class UserServiceImplTest {
         when(userRepository.findById(ID)).thenReturn(Optional.of(savedPerson));
         when(userMapper.personToUserDto(savedPerson)).thenReturn(userDto);
 
-        assertEquals(userDto, userService.getUserById(ID));
-        verify(userRepository, times(1)).findById(anyLong());
+        assertEquals(userDto, userService.findById(ID));
+        verify(userRepository, times(1)).findById(ID);
         verify(userMapper, times(1)).personToUserDto(any());
     }
 
@@ -109,9 +110,9 @@ public class UserServiceImplTest {
     @DisplayName("Поиск пользователя по id. Ошибка. Id не существует.")
     void getPersonById_NegativeTest_NotFoundException() {
 
-        assertThrows(NotFoundException.class, () -> userService.getUserById(2L));
+        assertThrows(NotFoundException.class, () -> userService.findById(2L));
 
-        assertThatThrownBy(() -> userService.getUserById(NOT_EXIST_ID))
+        assertThatThrownBy(() -> userService.findById(NOT_EXIST_ID))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("User with id" + NOT_EXIST_ID + " doesn't exist");
 
@@ -122,8 +123,8 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("Удаление пользователя по id. Должно пройти успешно.")
     void deletePersonById_Test() {
-        userService.deleteUserById(ID);
+        userService.deleteById(ID);
 
-        verify(userRepository, times(1)).deleteById(anyLong());
+        verify(userRepository, times(1)).deleteById(ID);
     }
 }

@@ -33,23 +33,22 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testing book functionality.")
 public class BookServiceImplTest {
     @InjectMocks
-    BookServiceImpl bookService;
-
+    private BookServiceImpl bookService;
     @Mock
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Mock
-    BookMapper bookMapper;
+    private BookMapper bookMapper;
 
-    Book book = new Book();
-    Book savedBook = new Book();
-    Person person = new Person();
-    BookDto bookDto = new BookDto();
-    BookDto savedDto = new BookDto();
+    private final Book book = new Book();
+    private final Book savedBook = new Book();
+    private final Person person = new Person();
+    private final BookDto bookDto = new BookDto();
+    private final BookDto savedDto = new BookDto();
 
-    long ID = 1L;
-    long NOT_EXIST_ID = 2L;
+    private final long ID = 1L;
+    private final long NOT_EXIST_ID = 2L;
 
     @BeforeEach
     void setUp() {
@@ -58,21 +57,22 @@ public class BookServiceImplTest {
         bookDto.setUserId(ID);
         bookDto.setAuthor("test author");
         bookDto.setTitle("test title");
-        bookDto.setPageCount(1000);
+        long PAGE_COUNT = 1000L;
+        bookDto.setPageCount(PAGE_COUNT);
 
         savedDto.setId(ID);
         savedDto.setUserId(ID);
         savedDto.setAuthor("test author");
         savedDto.setTitle("test title");
-        savedDto.setPageCount(1000);
+        savedDto.setPageCount(PAGE_COUNT);
 
-        book.setPageCount(1000);
+        book.setPageCount(PAGE_COUNT);
         book.setTitle("test title");
         book.setAuthor("test author");
         book.setPerson(person);
 
-        savedBook.setId(1L);
-        savedBook.setPageCount(1000);
+        savedBook.setId(ID);
+        savedBook.setPageCount(PAGE_COUNT);
         savedBook.setTitle("test title");
         savedBook.setAuthor("test author");
         savedBook.setPerson(person);
@@ -89,19 +89,19 @@ public class BookServiceImplTest {
         when(bookMapper.bookToBookDto(savedBook)).thenReturn(savedDto);
 
         //then
-        BookDto bookDtoResult = bookService.createBook(bookDto);
+        BookDto bookDtoResult = bookService.create(bookDto);
         assertEquals(ID, bookDtoResult.getId());
     }
 
     @Test
     @DisplayName("Обновление существующей книги. Должно пройти успешно.")
     void updateExistBook_Test() {
-        when(bookRepository.findAllByPersonId(ID)).thenReturn(Arrays.asList(savedBook));
+        when(bookRepository.findAllByPersonId(ID)).thenReturn(List.of(savedBook));
         when(bookMapper.bookDtoToBook(savedDto)).thenReturn(savedBook);
 
-        assertEquals(bookDto, bookService.updateBook(bookDto));
+        assertEquals(bookDto, bookService.update(bookDto));
 
-        verify(bookRepository, times(1)).findAllByPersonId(anyLong());
+        verify(bookRepository, times(1)).findAllByPersonId(ID);
         verify(bookRepository, times(1)).save(any());
         verify(bookMapper, times(1)).bookDtoToBook(any());
     }
@@ -117,9 +117,9 @@ public class BookServiceImplTest {
         when(bookRepository.save(book)).thenReturn(savedBook);
         when(bookMapper.bookToBookDto(book)).thenReturn(savedDto);
 
-        assertEquals(bookDto, bookService.updateBook(bookDto));
+        assertEquals(bookDto, bookService.update(bookDto));
 
-        verify(bookRepository, times(1)).findAllByPersonId(anyLong());
+        verify(bookRepository, times(1)).findAllByPersonId(ID);
         verify(bookRepository, times(1)).save(any());
         verify(userRepository, times(1)).findById(ID);
         verify(bookMapper, times(1)).bookToBookDto(any());
@@ -131,8 +131,8 @@ public class BookServiceImplTest {
         when(bookRepository.findById(ID)).thenReturn(Optional.of(savedBook));
         when(bookMapper.bookToBookDto(savedBook)).thenReturn(savedDto);
 
-        assertEquals(savedDto, bookService.getBookById(ID));
-        verify(bookRepository, times(1)).findById(anyLong());
+        assertEquals(savedDto, bookService.findById(ID));
+        verify(bookRepository, times(1)).findById(ID);
         verify(bookMapper, times(1)).bookToBookDto(any());
     }
 
@@ -140,9 +140,9 @@ public class BookServiceImplTest {
     @DisplayName("Получение книги по id. Ошибка. Id не существует.")
     void getPersonById_NegativeTest_NotFoundException() {
 
-        assertThrows(NotFoundException.class, () -> bookService.getBookById(NOT_EXIST_ID));
+        assertThrows(NotFoundException.class, () -> bookService.findById(NOT_EXIST_ID));
 
-        assertThatThrownBy(() -> bookService.getBookById(NOT_EXIST_ID))
+        assertThatThrownBy(() -> bookService.findById(NOT_EXIST_ID))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Book with id" + NOT_EXIST_ID + " doesn't exist");
 
@@ -153,9 +153,9 @@ public class BookServiceImplTest {
     @Test
     @DisplayName("Удаление книги по id. Должно пройти успешно.")
     void deleteBookById_Test() {
-        bookService.deleteBookById(ID);
+        bookService.deleteById(ID);
 
-        verify(bookRepository, times(1)).deleteById(anyLong());
+        verify(bookRepository, times(1)).deleteById(ID);
     }
 
     @Test
@@ -163,7 +163,7 @@ public class BookServiceImplTest {
     void getAllId_Test() {
         Set<Long> ids = new HashSet<>();
         ids.add(ID);
-        when(bookRepository.findAll()).thenReturn(Arrays.asList(savedBook));
+        when(bookRepository.findAll()).thenReturn(List.of(savedBook));
 
         assertEquals(ids, bookService.getAllId());
         verify(bookRepository, times(1)).findAll();
@@ -172,11 +172,11 @@ public class BookServiceImplTest {
     @Test
     @DisplayName("Получить все книги по id user. Должно пройти успешно.")
     void findAllByUserId_Test() {
-        when(bookRepository.findAllByPersonId(ID)).thenReturn(Arrays.asList(savedBook));
+        when(bookRepository.findAllByPersonId(ID)).thenReturn(Collections.singletonList(savedBook));
         when(bookMapper.bookToBookDto(savedBook)).thenReturn(savedDto);
 
-        assertEquals(Arrays.asList(savedDto), bookService.findAllByUserId(ID));
-        verify(bookRepository, times(1)).findAllByPersonId(anyLong());
+        assertEquals(Collections.singletonList(savedDto), bookService.findAllByUserId(ID));
+        verify(bookRepository, times(1)).findAllByPersonId(ID);
     }
 
     @Test
@@ -184,6 +184,6 @@ public class BookServiceImplTest {
     void deleteAllBooksByUserId_Test() {
         bookService.deleteAllBooksByUserId(ID);
 
-        verify(bookRepository, times(1)).deleteAllByPersonId(anyLong());
+        verify(bookRepository, times(1)).deleteAllByPersonId(ID);
     }
 }

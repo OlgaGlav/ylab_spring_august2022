@@ -28,7 +28,7 @@ public class BookServiceImpl implements BookService {
     private final UserRepository userRepository;
 
     @Override
-    public BookDto createBook(BookDto bookDto) {
+    public BookDto create(BookDto bookDto) {
         Book book = mapper.bookDtoToBook(bookDto);
         book.setPerson(userRepository.findById(bookDto.getUserId()).get());
         log.info("Mapped book: {}", book);
@@ -38,14 +38,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto updateBook(BookDto bookDto) {
+    public BookDto update(BookDto bookDto) {
         bookRepository.findAllByPersonId(bookDto.getUserId()).stream()
                 .filter(book -> book.getTitle().equals(bookDto.getTitle()))
                 .findAny()
                 .ifPresentOrElse(
                         book -> update(bookDto, book),
                         () -> {
-                            createBook(bookDto);
+                            create(bookDto);
                             log.info("Created new book");
                         });
         return bookDto;
@@ -60,21 +60,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto getBookById(Long id) {
+    public BookDto findById(Long id) {
         log.info("Finded book with id: {}", id);
         return mapper.bookToBookDto(bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book with id" + id + " doesn't exist")));
     }
 
     @Override
-    public void deleteBookById(Long id) {
+    public void deleteById(Long id) {
         bookRepository.deleteById(id);
         log.info("Book with id {} deleted", id);
     }
 
     @Override
     public Set<Long> getAllId() {
-        return ((List<Book>) bookRepository.findAll()).stream()
+        return (bookRepository.findAll()).stream()
                 .map(Book::getId).collect(Collectors.toSet());
     }
 

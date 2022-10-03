@@ -3,7 +3,7 @@ package com.edu.ulab.app.service.impl;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.mapper.UserMapper;
-import com.edu.ulab.app.mapper.UserMapperTemplate;
+import com.edu.ulab.app.mapper.UserRowMapper;
 import com.edu.ulab.app.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +22,12 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 @Service("user_template")
-public class UserServiceImplTemplate implements UserService {
+public class JdbcUserServiceImpl implements UserService {
     private final UserMapper mapper;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto create(UserDto userDto) {
 
         final String INSERT_SQL = "INSERT INTO PERSON(FULL_NAME, TITLE, AGE) VALUES (?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -38,7 +38,7 @@ public class UserServiceImplTemplate implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto) {
+    public UserDto update(UserDto userDto) {
         final String UPDATE_SQL = "UPDATE PERSON SET FULL_NAME = ?, TITLE = ?, AGE = ? WHERE ID = ?";
         jdbcTemplate.update(
                 connection -> {
@@ -51,11 +51,11 @@ public class UserServiceImplTemplate implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserDto findById(Long id) {
         log.info("Finded user with id: {}", id);
         String sql = "SELECT * FROM PERSON WHERE ID = " + id;
         try {
-            Person person = jdbcTemplate.queryForObject(sql, new UserMapperTemplate());
+            Person person = jdbcTemplate.queryForObject(sql, new UserRowMapper());
             return mapper.personToUserDto(person);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("User with id " + id + " doesn't exist.");
@@ -63,7 +63,7 @@ public class UserServiceImplTemplate implements UserService {
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteById(Long id) {
         String sql = "DELETE FROM PERSON WHERE ID = " + id;
         jdbcTemplate.execute(sql);
         log.info("User with id {} deleted", id);

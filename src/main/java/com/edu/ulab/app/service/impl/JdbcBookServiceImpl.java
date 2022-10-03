@@ -3,7 +3,7 @@ package com.edu.ulab.app.service.impl;
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
 import com.edu.ulab.app.mapper.BookMapper;
-import com.edu.ulab.app.mapper.BookMapperTemplate;
+import com.edu.ulab.app.mapper.BookRowMapper;
 import com.edu.ulab.app.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service("book_template")
-public class BookServiceImplTemplate implements BookService {
+public class JdbcBookServiceImpl implements BookService {
 
     private final BookMapper mapper;
     private final JdbcTemplate jdbcTemplate;
 
 
     @Override
-    public BookDto createBook(BookDto bookDto) {
+    public BookDto create(BookDto bookDto) {
         final String INSERT_SQL = "INSERT INTO BOOK (TITLE, AUTHOR, PAGE_COUNT, PERSON_ID) VALUES (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
@@ -40,9 +40,9 @@ public class BookServiceImplTemplate implements BookService {
     }
 
     @Override
-    public BookDto updateBook(BookDto bookDto) {
+    public BookDto update(BookDto bookDto) {
         List<Book> books = jdbcTemplate.query("SELECT * FROM BOOK WHERE PERSON_ID = ?",
-                new BookMapperTemplate(),
+                new BookRowMapper(),
                 bookDto.getUserId());
 
         books.stream()
@@ -62,7 +62,7 @@ public class BookServiceImplTemplate implements BookService {
                             log.info("Updated book: {}", book);
                         },
                         () -> {
-                            createBook(bookDto);
+                            create(bookDto);
                             log.info("Created new book");
                         });
 
@@ -70,30 +70,30 @@ public class BookServiceImplTemplate implements BookService {
     }
 
     @Override
-    public BookDto getBookById(Long id) {
+    public BookDto findById(Long id) {
         log.info("Finded book with id: {}", id);
         String sql = "SELECT * FROM BOOK WHERE ID = ?";
-        return mapper.bookToBookDto(jdbcTemplate.queryForObject(sql, new BookMapperTemplate(), id));
+        return mapper.bookToBookDto(jdbcTemplate.queryForObject(sql, new BookRowMapper(), id));
     }
 
     @Override
-    public void deleteBookById(Long id) {
+    public void deleteById(Long id) {
         String sql = "DELETE FROM BOOK WHERE ID = ?";
-        jdbcTemplate.queryForObject(sql, new BookMapperTemplate(), id);
+        jdbcTemplate.queryForObject(sql, new BookRowMapper(), id);
         log.info("Book with id {} deleted", id);
     }
 
     @Override
     public Set<Long> getAllId() {
         String sql = "SELECT * FROM BOOK";
-        List<Book> books = jdbcTemplate.query(sql, new BookMapperTemplate());
+        List<Book> books = jdbcTemplate.query(sql, new BookRowMapper());
         return books.stream().map(Book::getId).collect(Collectors.toSet());
     }
 
     @Override
     public List<BookDto> findAllByUserId(Long userId) {
         String sql = "SELECT * FROM BOOK b WHERE PERSON_ID =" + userId;
-        List<Book> books = jdbcTemplate.query(sql, new BookMapperTemplate());
+        List<Book> books = jdbcTemplate.query(sql, new BookRowMapper());
         return books.stream().map(mapper::bookToBookDto).collect(Collectors.toList());
     }
 

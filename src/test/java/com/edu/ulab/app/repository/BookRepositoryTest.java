@@ -21,13 +21,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SystemJpaTest
 public class BookRepositoryTest {
-    @Autowired
-    BookRepository bookRepository;
-    @Autowired
-    UserRepository userRepository;
 
-    Person person = new Person();
-    Book book = new Book();
+    private final BookRepository bookRepository;
+    private final UserRepository userRepository;
+    private final Person person = new Person();
+    private final Book book = new Book();
+    private final long PAGE_COUNT = 1000L;
+
+    @Autowired
+    public BookRepositoryTest(BookRepository bookRepository,
+                              UserRepository userRepository) {
+        this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
+    }
 
     @BeforeEach
     void setUp() {
@@ -39,10 +45,10 @@ public class BookRepositoryTest {
 
         book.setAuthor("Test Author");
         book.setTitle("test");
-        book.setPageCount(1000);
+        book.setPageCount(PAGE_COUNT);
     }
 
-    @DisplayName("Сохранить книгу и автора. Число select должно равняться 2")
+    @DisplayName("Сохранить книгу и автора.")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
@@ -58,15 +64,12 @@ public class BookRepositoryTest {
         Book result = bookRepository.save(book);
 
         //Then
-        assertThat(result.getPageCount()).isEqualTo(1000);
+        assertThat(result.getPageCount()).isEqualTo(PAGE_COUNT);
         assertThat(result.getTitle()).isEqualTo("test");
-        assertSelectCount(0);
-        assertInsertCount(2);
-        assertUpdateCount(0);
-        assertDeleteCount(0);
+        checkAssertCount(0, 2, 0, 0);
     }
 
-    @DisplayName("Сохранить книгу и автора. Число _________ должно равняться ___")
+    @DisplayName("Сохранить книгу и автора.")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
@@ -82,15 +85,12 @@ public class BookRepositoryTest {
         Book result = bookRepository.save(book);
 
         //Then
-        assertThat(result.getPageCount()).isEqualTo(1000);
+        assertThat(result.getPageCount()).isEqualTo(PAGE_COUNT);
         assertThat(result.getTitle()).isEqualTo("test");
-        assertSelectCount(0);
-        assertInsertCount(2);
-        assertUpdateCount(0);
-        assertDeleteCount(0);
+        checkAssertCount(0, 2, 0, 0);
     }
 
-    @DisplayName("Обновить книгу и автора. Число _________ должно равняться ___")
+    @DisplayName("Обновить книгу и автора.")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
@@ -98,6 +98,7 @@ public class BookRepositoryTest {
             "classpath:sql/3_insert_book_data.sql"
     })
     void updateBook_thenAssertDmlCount() {
+        long newPageCount = 2000L;
         //Given
         Person savedPerson = userRepository.save(person);
         book.setPerson(savedPerson);
@@ -107,7 +108,7 @@ public class BookRepositoryTest {
         updateBook.setId(book.getId());
         updateBook.setAuthor("New Test Author");
         updateBook.setTitle("test");
-        updateBook.setPageCount(2000);
+        updateBook.setPageCount(newPageCount);
         updateBook.setPerson(savedPerson);
 
         //When
@@ -115,14 +116,11 @@ public class BookRepositoryTest {
 
         //Then
         assertThat(result.getAuthor()).isEqualTo("New Test Author");
-        assertThat(result.getPageCount()).isEqualTo(2000);
-        assertSelectCount(0);
-        assertInsertCount(2);
-        assertUpdateCount(0);
-        assertDeleteCount(0);
+        assertThat(result.getPageCount()).isEqualTo(newPageCount);
+        checkAssertCount(0, 2, 0, 0);
     }
 
-    @DisplayName("Получить книгу и автора по id. Число _________ должно равняться ___")
+    @DisplayName("Получить книгу и автора по id.")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
@@ -140,14 +138,11 @@ public class BookRepositoryTest {
 
         //Then
         assertThat(result.get().getAuthor()).isEqualTo("Test Author");
-        assertThat(result.get().getPageCount()).isEqualTo(1000);
-        assertSelectCount(0);
-        assertInsertCount(2);
-        assertUpdateCount(0);
-        assertDeleteCount(0);
+        assertThat(result.get().getPageCount()).isEqualTo(PAGE_COUNT);
+        checkAssertCount(0, 2, 0, 0);
     }
 
-    @DisplayName("Удалить все книг по id автора. Число _________ должно равняться ___")
+    @DisplayName("Удалить все книг по id автора.")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
@@ -165,13 +160,13 @@ public class BookRepositoryTest {
 
         //Then
         assertThat(bookRepository.findAllByPersonId(person.getId()) == null);
-        assertSelectCount(2);
-        assertInsertCount(2);
-        assertUpdateCount(0);
-        assertDeleteCount(1);
+        checkAssertCount(2, 2, 0, 1);
     }
 
-    //todo
-    // * failed
-
+    private void checkAssertCount(int select, int insert, int update, int delete) {
+        assertSelectCount(select);
+        assertInsertCount(insert);
+        assertUpdateCount(update);
+        assertDeleteCount(delete);
+    }
 }

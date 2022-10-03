@@ -16,6 +16,7 @@ public class UserRowMapper implements RowMapper<Person>, Serializable {
         person.setFullName(rs.getString("FULL_NAME"));
         person.setTitle(rs.getString("TITLE"));
         person.setAge(rs.getInt("AGE"));
+        person.setEmail(rs.getString("EMAIL"));
         return person;
     }
 }

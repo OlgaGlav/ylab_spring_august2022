@@ -3,6 +3,7 @@ package com.edu.ulab.app.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -20,10 +21,10 @@ public class Person {
     @Size(min = 2, max = 255)
     private String title;
 
-    //todo
-    //    @Column(nullable = false)
-    //    private int count;
     private int age;
+
+    @Email
+    private String email;
 
     @OneToMany(mappedBy = "person")
     private List<Book> books;

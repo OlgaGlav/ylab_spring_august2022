@@ -29,7 +29,7 @@ public class JdbcUserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
 
-        final String INSERT_SQL = "INSERT INTO PERSON(FULL_NAME, TITLE, AGE) VALUES (?,?,?)";
+        final String INSERT_SQL = "INSERT INTO PERSON(FULL_NAME, TITLE, AGE, EMAIL) VALUES (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> getPreparedStatement(userDto, INSERT_SQL, connection), keyHolder);
@@ -39,11 +39,11 @@ public class JdbcUserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-        final String UPDATE_SQL = "UPDATE PERSON SET FULL_NAME = ?, TITLE = ?, AGE = ? WHERE ID = ?";
+        final String UPDATE_SQL = "UPDATE PERSON SET FULL_NAME = ?, TITLE = ?, AGE = ?, EMAIL = ? WHERE ID = ?";
         jdbcTemplate.update(
                 connection -> {
                     PreparedStatement ps = getPreparedStatement(userDto, UPDATE_SQL, connection);
-                    ps.setLong(4, userDto.getId());
+                    ps.setLong(5, userDto.getId());
                     return ps;
                 });
         log.info("User update");
@@ -74,6 +74,7 @@ public class JdbcUserServiceImpl implements UserService {
         ps.setString(1, userDto.getFullName());
         ps.setString(2, userDto.getTitle());
         ps.setLong(3, userDto.getAge());
+        ps.setString(4, userDto.getEmail());
         return ps;
     }
 }
